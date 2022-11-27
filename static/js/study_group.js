@@ -177,6 +177,7 @@ function viewStudy(study_id) {
         success: function (result) {
             let studyDetail = result["study_detail"]
             let recommendStudies = result["recommend_studies"]
+            console.log(studyDetail)
             console.log('성공:', result, result['thumbnail_img']);
             // $('#thumbnail-img').attr('src', result['thumbnail_img']);
             $('#modal-head').attr('style', `background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)), url(${hostUrl}${studyDetail['thumbnail_img']});
@@ -211,6 +212,7 @@ function viewStudy(study_id) {
 
 
             if (isAuthor) {
+                console.log("작성자입니다")
                 $('#status').text('수정 하기')
                 $('#status').attr('class', 'btn btn-outline-warning')
                 $('#student-btn').attr('style', 'display:inline;')
@@ -244,28 +246,28 @@ function viewStudy(study_id) {
             $('#star').attr('onclick', `studyLike(${studyDetail.id})`)
             if (recommendStudies) {
                 loadRecommendStudy(recommendStudies)
-            }else{
+            } else {
                 $('#tady-word').text('테디가 분석할 정보가 충분하지 않아요ㅠ')
             }
 
-            if (isPenalty){
+            if (isPenalty) {
 
                 var limitType = studyDetail["limit_type"]
                 var numDays = studyDetail["days"]
-                
-                if(limitType === 'CT'){
+
+                if (limitType === 'CT') {
                     limitType = '출석 체크 스터디!'
-                }else{
+                } else {
                     limitType = '공부 시간 스터디!'
                 }
 
                 // 이럴거면 숫자말고 '월화수' 이런 식으로 저장하는게 났지 않았냐?
                 var days = ``
-                for(var i = 0; i<numDays.length; i ++){
+                for (var i = 0; i < numDays.length; i++) {
                     var week = '월화수목금토일'
                     var idx = Number(numDays[i])
 
-                    days +=`
+                    days += `
                     <span class ="m-2 p-1" style="border-radius : 10px;border: 1px solid red;">${week[idx]}</span>
                     `
                 }
@@ -300,36 +302,33 @@ function viewStudy(study_id) {
 }
 
 async function isStudent(user_id, post_id, is_accept) {
-    if (is_accept == null) {
-        const login_user = JSON.parse(localStorage.getItem('payload')).user_id
-        console.log(login_user)
-        const result = document.getElementById("is_Student").value
-        console.log(document.getElementById("is_Student").value)
-        // $.ajax({
-        //     type: "POST",
-        //     data: {},
-        //     headers: {
-        //         'content-type': 'application/json',
-        //     },
-        //     url: `${hostUrl}/${post_id}/accept/${user_id}`,
-        //     success: function
 
-        // });
-        const response = await fetch(`${hostUrl}/studies/${post_id}/accept/${user_id}/`, {
-            headers: {
-                'content-type': 'application/json',
-                "Authorization": "Bearer " + localStorage.getItem("access"),
-            },
-            method: "POST",
-            body: JSON.stringify({
-                user_id: user_id,
-                post: post_id,
-                is_accept: result
-            }),
-        })
-        const response_json = await response.json()
-        console.log(response_json)
+    const login_user = JSON.parse(localStorage.getItem('payload')).user_id
+    console.log(login_user)
+
+    let method = '';
+    if (is_accept == true) {
+        method = "POST"
+    } else if (is_accept == false) {
+        method = "DELETE"
     }
+    const response = await fetch(`${hostUrl}/studies/${post_id}/accept/${user_id}/`, {
+        headers: {
+            'content-type': 'application/json',
+            "Authorization": "Bearer " + localStorage.getItem("access"),
+        },
+        method: method,
+        body: JSON.stringify({
+            user_id: user_id,
+            post: post_id,
+            is_accept: is_accept
+        }),
+    })
+
+    // const response_json = await response.json()
+    // console.log(response_json)
+
+    viewStudy(post_id)
 }
 
 function propose(study_id, type) {
@@ -452,7 +451,7 @@ function search() {
     });
 }
 
-function moveStudyPage(studyId){
+function moveStudyPage(studyId) {
     // var dict1 = {'recent_study_id':1};
     // localStorage.setItem('stady', JSON.stringify(dict1));
     let stady = JSON.parse(localStorage.getItem('stady', ''))

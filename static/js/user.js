@@ -15,18 +15,14 @@ async function handleSignin() {
             "password": password
         })
     })
-        .then(res => res.json())  //응답 결과를 json으로 파싱
-        .then(data => {
-            //***여기서 응답 결과로 실행할 동작을 정의하면 됨***
-            // [ data.키값 ] 이런 형태로 value 추출 가능 
-            alert(data['username']); //응답 결과를 console 창에 출력
-        })
-        .catch(err => { // 오류 발생시 오류를 담아서 보여줌
-            console.log('Fetch Error', err);
-        });
 
-    if (response.status == 201) {
+    if (response.ok) {
+        alert("회원가입 되었습니다.")
         window.location.href = "/user/login.html"
+    } else {
+        const response_json = await response.json()
+        alert(response_json.message);
+        console.warn(`${response.status} 에러가 발생했습니다.`)
     }
 }
 
