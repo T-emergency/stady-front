@@ -28,7 +28,9 @@ function getStudy() {
 
         success: function (result) {
             console.log(result, result["is_penalty"])
+            console.log(result["content"])
             $('#content-wrap').html(result["content"])
+
             let students = result["students"]
 
             if (result["is_penalty"]) {
@@ -66,6 +68,12 @@ function getStudy() {
 
             if (result["user"] == payload["user_id"]) {
                 studyAuthor(result)
+                let content = result["content"]
+                content = content.replaceAll("<br/>", "\r\n");
+                $('#content-wrap').html(
+                    `<textarea id ="content-wrap2" style="width:100%; height:400px; border: none;
+                resize: none;" value="">${content}</textarea>`
+                )
             }
             else {
                 studyStudent(result)
@@ -125,7 +133,7 @@ function getStudyPost(page = 1) {
                         </div>
                     `
             }
-            console.log("시간은 ", time)
+
             $('#content-wrap').html(temp);
             $("time.timeago").timeago();
 
@@ -217,7 +225,7 @@ function getStudyPostDetail(postId) {
             console.log('포스트 디테일', result)
             var commentList = result['comments']
             var time = new Date(result["create_dt"]).toLocaleDateString() + new Date(result["create_dt"]).toLocaleTimeString()
-            // var time = result["create_dt"].slice(undefined,-7) + "Z"
+            // var time = result["create_dt"].slice(undefined,-7) //+ "Z"
 
             var temp = `
                 <div id="post-info" class = "text-secondary" style = "margin-left : 10px">
@@ -292,7 +300,15 @@ function getStudyPostDetail(postId) {
 function studyAuthor(result) {
     let students = result["students"]
     let isPenalty = result["is_penalty"]
+
     var temp = `
+            <div class = "text-center mb-3" style="font-weight : 600;">
+                <div class="btn btn-primary" onclick="updateStudy()">
+                    <!-- <i class="far fa-pen" style="color: white;"></i> -->
+                    <i class="fas fa-pen"></i>
+                    수정하기
+                </div>
+            </div>
             <div class = "text-center mb-3" style="font-weight : 600;">
                 <i class="fas fa-user-circle"></i>
                 스터디 멤버들
@@ -551,4 +567,31 @@ function postDelete(postId) {
             console.log('삭제 성공')
         },
     });
+}
+
+function updateStudy() {
+    let content = $('#content-wrap2').val()
+    content = content.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+
+    let formData = new FormData();
+    formData.append("content", content);
+
+    $.ajax({
+        type: "PUT",
+        url: `http://127.0.0.1:8000/studies/${STUDYID}/`,
+        processData: false,
+        contentType: false,
+        data: formData,
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access"),
+        },
+        success: function (rtn) {
+            console.log("rtn: ", rtn)
+            window.location.href = "/study_group/study_detail.html"
+        },
+        err: function (err) {
+            console.log("err:", err)
+        }
+    })
+
 }
