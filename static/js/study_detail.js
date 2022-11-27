@@ -308,6 +308,11 @@ function studyAuthor(result) {
                     <i class="fas fa-pen"></i>
                     수정하기
                 </div>
+                <div class="btn btn-primary" onclick="deleteStudy()">
+                    <!-- <i class="far fa-pen" style="color: white;"></i> -->
+                    <i class="fas fa-pen"></i>
+                    삭제하기
+                </div>
             </div>
             <div class = "text-center mb-3" style="font-weight : 600;">
                 <i class="fas fa-user-circle"></i>
@@ -588,6 +593,27 @@ function updateStudy() {
         success: function (rtn) {
             console.log("rtn: ", rtn)
             window.location.href = "/study_group/study_detail.html"
+        },
+        err: function (err) {
+            console.log("err:", err)
+        }
+    })
+
+}
+
+function deleteStudy() {
+
+    $.ajax({
+        type: "DELETE",
+        url: `http://127.0.0.1:8000/studies/${STUDYID}/`,
+        processData: false,
+        contentType: false,
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access"),
+        },
+        success: function (rtn) {
+            console.log("rtn: ", rtn)
+            window.location.href = "/study_group/index.html"
         },
         err: function (err) {
             console.log("err:", err)
