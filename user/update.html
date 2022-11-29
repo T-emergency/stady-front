@@ -72,10 +72,10 @@
       <hr>
 
       <input id="submit" type="button" value="변경완료" class="btn" />
-
+      <input id="delete" type="button" value="회원탈퇴" class="btn" />
       </form>
       <!-- <button onclick="submit()" class="btn btn-outline-primary" > 전송 </button> -->
-      <button id="submit"> tt </button>
+      <!-- <button id="submit"> tt </button> -->
 
     </div>
     </div>
@@ -120,7 +120,8 @@
         },
 
         success: function (result) { // 성공 시
-          alert("alert 테스트", result);
+          alert("저장되었습니다", result);
+          window.location.href = '/profile/profile.html'
         }
 
       });
@@ -159,6 +160,33 @@
       });
     });
 
+
+  </script>
+
+  <script>
+
+    $('#delete').click(function () {
+      let payload = JSON.parse(localStorage.getItem('payload'))
+      if (confirm("정말 회원 탈퇴를 하시겠습니까?") == true) {
+        $.ajax({
+
+          type: "DELETE",
+          url: "http://127.0.0.1:8000/user/",
+          processData: false,
+          contentType: false,
+          headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access"),
+          },
+          data: payload.user_id,
+
+          success: function (result) { // 성공 시
+            alert("그동안 저희 서비스를 이용해 주셔서 감사합니다", result);
+            window.location.href = '/user/login.html'
+          }
+
+        });
+      }
+    });
 
   </script>
 
